@@ -31,5 +31,5 @@ Route::get('home', [HomeController::class, 'index'])->name('home');
 
 Auth::routes();
 
-Route::get('/home', [HomeController::class, 'index'])->name('home');
+Route::get('/home', [Controller::class, 'listUser'])->name('home');
 Route::get('logout', [LoginController::class, 'logout'])->name('logout');

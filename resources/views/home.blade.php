@@ -28,14 +28,14 @@
                         </tr>
                     @endforeach
                     </tbody>
-                    <div class="row mt-5">
-                        <div class="col text-center">
-                            <div class="row justify-content-center">
-                                {{ $users->links() }}
-                            </div>
+                </table>
+                <div class="row mt-5">
+                    <div class="col text-center">
+                        <div class="row justify-content-center">
+                            {{ $users->links() }}
                         </div>
                     </div>
-                </table>
+                </div>
             </div>
         </div>
     </div>

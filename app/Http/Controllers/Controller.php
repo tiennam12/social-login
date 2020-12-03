@@ -69,4 +69,10 @@ class Controller extends BaseController
         }
         return $user;
     }
+
+    function listUser() {
+        $users = User::all();
+
+        return view('home', ['users' => $users]);
+    }
 }

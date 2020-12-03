@@ -23,7 +23,6 @@
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
                             <td><img src="{{ $user->avatar }}" alt="avatar" width="50" height="50"></td>
-                            <td>{{ $user->avatar }}</td>
                             <td>{{ $user->provider_id }}</td>
                             <td>{{ $user->provider }}</td>
                         </tr>

@@ -23,11 +23,19 @@
                             <td>{{ $user->name }}</td>
                             <td>{{ $user->email }}</td>
                             <td><img src="{{ $user->avatar }}" alt="avatar" width="50" height="50"></td>
+                            <td>{{ $user->avatar }}</td>
                             <td>{{ $user->provider_id }}</td>
                             <td>{{ $user->provider }}</td>
                         </tr>
                     @endforeach
                     </tbody>
+                    <div class="row mt-5">
+                        <div class="col text-center">
+                            <div class="row justify-content-center">
+                                {{ $users->links() }}
+                            </div>
+                        </div>
+                    </div>
                 </table>
             </div>
         </div>

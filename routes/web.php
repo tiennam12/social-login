@@ -33,3 +33,6 @@ Auth::routes();
 
 Route::get('/home', [Controller::class, 'listUser'])->name('home');
 Route::get('logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::get('/pagination', [Controller::class, 'index']);
+Route::get('pagination/fetch_data', [Controller::class, 'fetch_data']);

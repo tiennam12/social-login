@@ -27,16 +27,30 @@
                             <td>{{ $user->provider }}</td>
                         </tr>
                     @endforeach
-
-
                     </tbody>
-{{--                    {{ $users->links() }}--}}
                 </table>
                 <div class="d-flex justify-content-center">
                     {!! $users->links('pagination::bootstrap-4') !!}
                 </div>
-
             </div>
         </div>
     </div>
 </div>
+{{--<script>--}}
+{{--    $('.pagination a').unbind('click').on('click', function(e) {--}}
+{{--        e.preventDefault();--}}
+{{--        var page = $(this).attr('href').split('page=')[1];--}}
+{{--        getUsers(page);--}}
+{{--    });--}}
+
+{{--    function getUsers(page)--}}
+{{--    {--}}
+{{--        $.ajax({--}}
+{{--            type: "GET",--}}
+{{--            url: '?page='+ page--}}
+{{--        })--}}
+{{--            .success(function(data) {--}}
+{{--                $('body').html(data);--}}
+{{--            });--}}
+{{--    }--}}
+{{--</script>--}}

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Auth;
 use Socialite;
@@ -38,7 +39,7 @@ class Controller extends BaseController
                 Auth::login($newUser);
 
             }
-            return redirect()->route('home');
+            return redirect()->route('users');
 
         } catch (Exception $e) {
             return redirect('auth/google');
@@ -53,7 +54,8 @@ class Controller extends BaseController
         $getUser = Socialite::driver($provider)->stateless()->user();
         $user = $this->createUser($getUser,$provider);
         auth()->login($user);
-        return redirect()->to('/home');
+
+        return redirect()->route('users');
     }
 
     function createUser($getUser,$provider) {
@@ -70,10 +72,14 @@ class Controller extends BaseController
         return $user;
     }
 
-    function listUser() {
-//        $users = User::paginate(config('user.paginate'));
-        $users = User::paginate(2);
+    function listUser(Request $request)
+    {
+        $perPage = request('perPage', 3);
+        $users = User::orderBy('id', 'ASC')->paginate($perPage);
 
-        return view('home', ['users' => $users])->render();
+        if ($request->ajax()) {
+            return view('load_users_data', compact('users'));
+        }
+        return view('users', compact('users', 'perPage'));
     }
 }

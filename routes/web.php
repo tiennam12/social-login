@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
-use App\Models\User;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -28,9 +28,11 @@ Route::get('redirect/{driver}', [Controller::class, 'redirectToProvider'])
 Route::get('google/callback', [Controller::class, 'handleGoogleCallback']);
 Route::get('/auth/redirect/{provider}', [Controller::class, 'redirect']);
 Route::get('/callback/{provider}', [Controller::class, 'callback']);
-Route::get('home', [HomeController::class, 'index'])->name('home');
+//Route::get('home', [HomeController::class, 'index'])->name('home');
 
 Auth::routes();
 
-Route::get('/home', [Controller::class, 'listUser'])->name('home');
+//Route::get('/home', [Controller::class, 'listUser'])->name('home');
 Route::get('logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::get('/users', [Controller::class, 'listUser'])->name('users');

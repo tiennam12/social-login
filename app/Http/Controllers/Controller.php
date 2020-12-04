@@ -71,8 +71,9 @@ class Controller extends BaseController
     }
 
     function listUser() {
-        $users = User::paginate(config('user.paginate'));
+//        $users = User::paginate(config('user.paginate'));
+        $users = User::paginate(2);
 
-        return view('home', ['users' => $users]);
+        return view('home', ['users' => $users])->render();
     }
 }

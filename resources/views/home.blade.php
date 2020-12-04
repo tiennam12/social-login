@@ -27,36 +27,32 @@
                             <td>{{ $user->provider }}</td>
                         </tr>
                     @endforeach
-
-
                     </tbody>
-{{--                    {{ $users->links() }}--}}
                 </table>
                 <div class="d-flex justify-content-center">
-{{--                    {!! $users->links('pagination::bootstrap-4') !!}--}}
+                    {!! $users->links('pagination::bootstrap-4') !!}
                 </div>
-
             </div>
         </div>
     </div>
 </div>
 <script>
-    /*==================== PAGINATION =========================*/
-    $(window).on('hashchange',function(){
+    $(window).on('hashchange',function() {
         page = window.location.hash.replace('#','');
-        getProducts(page);
+        getUsers(page);
     });
+
     $(document).on('click','.pagination a', function(e){
         e.preventDefault();
-        var page = $(this).attr('href').split('page=')[1];
-        // getProducts(page);
+        page = $(this).attr('href').split('page=')[1];
         location.hash = page;
     });
-    function getProducts(page){
+
+    function getUsers(page) {
         $.ajax({
-            url: '/users?page=' + page
+            url: '/home?page='+page
         }).done(function(data){
-            $('.content').html(data);
+            $('#lorem').html(data);
         });
     }
 </script>

@@ -8,7 +8,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
 use Auth;
 use Socialite;
-use App\Models\User;
+use App\User;
 
 class Controller extends BaseController
 {
@@ -71,7 +71,8 @@ class Controller extends BaseController
     }
 
     function listUser() {
-        $users = User::paginate(config('user.paginate'));
+//        $users = User::paginate(config('user.paginate'));
+        $users = User::all();
 
         return view('home', ['users' => $users]);
     }

@@ -27,16 +27,36 @@
                             <td>{{ $user->provider }}</td>
                         </tr>
                     @endforeach
+
+
                     </tbody>
-                    <div class="row mt-5">
-                        <div class="col text-center">
-                            <div class="row justify-content-center">
-                                {{ $users->links() }}
-                            </div>
-                        </div>
-                    </div>
+{{--                    {{ $users->links() }}--}}
                 </table>
+                <div class="d-flex justify-content-center">
+{{--                    {!! $users->links('pagination::bootstrap-4') !!}--}}
+                </div>
+
             </div>
         </div>
     </div>
 </div>
+<script>
+    /*==================== PAGINATION =========================*/
+    $(window).on('hashchange',function(){
+        page = window.location.hash.replace('#','');
+        getProducts(page);
+    });
+    $(document).on('click','.pagination a', function(e){
+        e.preventDefault();
+        var page = $(this).attr('href').split('page=')[1];
+        // getProducts(page);
+        location.hash = page;
+    });
+    function getProducts(page){
+        $.ajax({
+            url: '/users?page=' + page
+        }).done(function(data){
+            $('.content').html(data);
+        });
+    }
+</script>

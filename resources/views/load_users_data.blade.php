@@ -8,21 +8,26 @@
             <th scope="col">Email</th>
             <th scope="col">Provider</th>
             <th scope="col">Provider id</th>
+            <th scope="col">Action</th>
         </tr>
         </thead>
         <tbody>
         @foreach($users as $user)
-            <tr>
+            <tr class="row_{{ $user->id }}">
                 <td>{{ $user->id }}</td>
                 <td>
                     @if($user->avatar)
-                        <img src="{{ $user->avatar }}" alt="Girl in a jacket" width="50" height="50">
+                        <img src="{{ $user->avatar }}" alt="ava" width="50" height="50">
                     @endif
                 </td>
                 <td>{{ $user->name }}</td>
                 <td>{{ $user->email }}</td>
                 <td>{{ $user->provider }}</td>
                 <td>{{ $user->provider_id }}</td>
+                <td>
+                    <button id="delete" class="delete" type="button" value="{{ $user->id }}">Delete</button>
+                    <button id="edit" class="edit" type="button" value="{{ $user->id }}">Edit</button>
+                </td>
             </tr>
         @endforeach
         </tbody>

@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\api\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,3 +18,8 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// Users API
+Route::put('/users/{user}',[UserController::class, 'update']);
+Route::delete('/users/{user}',[UserController::class, 'deleteUser']);
+Route::get('/users/{user}',[UserController::class, 'show']);

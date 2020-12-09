@@ -72,15 +72,13 @@ class Controller extends BaseController
         return $user;
     }
 
-    function listUser(Request $request)
-    {
-        $perPage = request('perPage', 2);
+    function listUser(Request $request) {
+        $perPage = request('perPage', config('user.paginate'));
         $users = User::orderBy('id', 'ASC')->paginate($perPage);
 
         if ($request->ajax()) {
             return view('load_users_data', compact('users'));
         }
-//        dd($perPage);
         return view('users', compact('users', 'perPage'));
     }
 }

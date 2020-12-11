@@ -33,11 +33,20 @@
                 @endif
                     <td>{{ $user->provider_id }}</td>
                 <td>
-                    <button style="border: none; background-color: white" id="edit" class="edit" type="button" value="{{ $user->id }}">
-                        <i class="far fa-edit" style="pointer-events:none; color: #80bfff"></i>
-                    </button>
-                    <button style="border: none; background-color: white" id="delete" class="delete" type="button" value="{{ $user->id }}">
+                    @if($user->status==0)
+                        <button style="border: none; background-color: white; outline: none; cursor:pointer;" id="lock" class="lock_{{ $user->id }} lock" type="button" value="{{ $user->id }}">
+                            <i class="fas fa-lock-open" style="pointer-events:none; color: #80bfff"></i>
+                        </button>
+                     @else
+                        <button style="border: none; outline: none; background-color: white; cursor:pointer;" id="lock" class="lock_{{ $user->id }} lock" type="button" value="{{ $user->id }}">
+                            <i class="fas fa-lock" style="pointer-events:none; color: #80bfff"></i>
+                        </button>
+                    @endif
+                    <button style="border: none; outline: none; background-color: white; cursor:pointer;" id="delete" class="delete" type="button" value="{{ $user->id }}">
                         <i class="fas fa-trash-alt" style="pointer-events:none; color: #80bfff"></i>
+                    </button>
+                    <button style="border: none; background-color: white; outline: none; cursor:pointer;" id="edit" class="edit" type="button" value="{{ $user->id }}">
+                        <i class="far fa-edit" style="pointer-events:none; color: #80bfff"></i>
                     </button>
                 </td>
             </tr>
@@ -74,7 +83,16 @@
                     table.append("<tr><td><button class='save' id='save'>Save</button></td><td><button class='cancel' id='cancel'>Cancel</button></td></tr>");
                     $('#table').html(table);
                     $(".cancel").click(function (e) {
-                        location.reload();
+                        swal({
+                            title: "",
+                            text: "Cancel",
+                            icon: "warning",
+                        })
+                            .then((willSave) => {
+                                if (willSave) {
+                                    location.reload();
+                                }
+                            });
                     });
                     $(".save").click(function (e) {
                         e.preventDefault();
@@ -86,14 +104,23 @@
                         var avatar = result["data"]["avatar"];
                         var created_at = result["data"]["created_at"];
                         var updated_at = result["data"]["updated_at"];
-                        var dataString = 'id=' + id + '&name=' + name + '&email=' + email + '&provider=' + provider + '&provider_id=' + provider_id + '&avatar=' + avatar+ '&created_at=' + created_at+ '&updated_at=' + updated_at;
+                        var status = result["data"]["status"];
+                        var dataString = 'id=' + id + '&name=' + name + '&email=' + email + '&provider=' + provider + '&provider_id=' + provider_id + '&avatar=' + avatar+ '&created_at=' + created_at+ '&updated_at=' + updated_at + '&status=' + status;
                         $.ajax({
                             type: 'PUT',
                             data: dataString,
                             url: 'api/users/'+ i + '?' + dataString,
                             success: function () {
-                                alert("success");
-                                location.reload();
+                                swal({
+                                    title: "Saved",
+                                    text: "Success",
+                                    icon: "success",
+                                })
+                                    .then((willSave) => {
+                                        if (willSave) {
+                                            location.reload();
+                                        }
+                                    });
                             }
                         });
                     })
@@ -105,17 +132,149 @@
     $(document).ready(function () {
         $('.delete').click(function (e) {
             var i = e.target.value;
-            alert("Delete");
-            $.ajax({
-                type: "DELETE",
-                url: 'api/users/'+i,
-                dataType: "json",
-                success: function () {
-                    $('.row_' + i).remove();
-                }
+            swal({
+                title: "Are you sure?",
+                text: "Delete this user?",
+                icon: "warning",
+                buttons: true,
+                dangerMode: true,
             })
+                .then((willDelete) => {
+                    if (willDelete) {
+                        $.ajax({
+                            type: "DELETE",
+                            url: 'api/users/'+i,
+                            dataType: "json",
+                            success: function () {
+                                $('.row_' + i).remove();
+                            }
+                        })
+                        swal("User has been deleted!", {
+                            icon: "success",
+                        });
+                    }
+                });
         })
     });
+
+    $(document).ready(function () {
+        $('.lock').click(function (e) {
+            var i = e.target.value;
+            $.ajax({
+                type: "GET",
+                url: 'api/users/'+i,
+                dataType: "json",
+                success: function (result) {
+                    if(result["data"]["status"] == 0) {
+                        swal({
+                            title: "Are you sure?",
+                            text: "Do you want to lock this user?",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        })
+                            .then((willLock) => {
+                                if (willLock) {
+                                    $.ajax({
+                                        type: "GET",
+                                        url: 'api/users/'+i,
+                                        dataType: "json",
+                                        success: function (result) {
+                                            if(result["data"]["status"] == 0) {
+                                                var st = '<i class="fas fa-lock" style="pointer-events:none; color: #80bfff"></i>';
+                                            } else {
+                                                var st = '<i class="fas fa-lock-open" style="pointer-events:none; color: #80bfff"></i>';
+                                            }
+                                            $('.lock_' + i).html(st);
+                                            var id = result["data"]["id"];
+                                            var avatar = result["data"]["avatar"];
+                                            var name = result["data"]["name"];
+                                            var provider = result["data"]["provider"];
+                                            var email = result["data"]["email"];
+                                            var provider_id = result["data"]["provider_id"];
+                                            var created_at = result["data"]["created_at"];
+                                            var updated_at = result["data"]["updated_at"];
+                                            var status = result["data"]["status"];
+
+                                            if(status==0){
+                                                status = 1;
+                                            } else {
+                                                status = 0;
+                                            }
+                                            var dataString = 'id=' + id + '&name=' + name + '&email=' + email + '&provider=' + provider + '&provider_id=' + provider_id + '&avatar=' + avatar+ '&created_at=' + created_at + '&updated_at=' + updated_at + '&status=' + status;
+                                            $.ajax({
+                                                type: 'PUT',
+                                                data: dataString,
+                                                url: 'api/users/'+ i + '?' + dataString,
+                                                success: function () {
+                                                    console.log('api/users/'+ i + '?' + dataString);
+                                                }
+                                            });
+                                        },})
+                                    swal("User has been locked!", {
+                                        icon: "success",
+                                    });
+                                }
+                            })
+                    } else {
+                        swal({
+                            title: "Are you sure?",
+                            text: "Do you want to unlock this user?",
+                            icon: "warning",
+                            buttons: true,
+                            dangerMode: true,
+                        })
+                            .then((willLock) => {
+                                if (willLock) {
+                                    $.ajax({
+                                        type: "GET",
+                                        url: 'api/users/'+i,
+                                        dataType: "json",
+                                        success: function (result) {
+                                            if(result["data"]["status"] == 0) {
+                                                var st = '<i class="fas fa-lock" style="pointer-events:none; color: #80bfff"></i>';
+                                            } else {
+                                                var st = '<i class="fas fa-lock-open" style="pointer-events:none; color: #80bfff"></i>';
+                                            }
+                                            $('.lock_' + i).html(st);
+                                            var id = result["data"]["id"];
+                                            var avatar = result["data"]["avatar"];
+                                            var name = result["data"]["name"];
+                                            var provider = result["data"]["provider"];
+                                            var email = result["data"]["email"];
+                                            var provider_id = result["data"]["provider_id"];
+                                            var created_at = result["data"]["created_at"];
+                                            var updated_at = result["data"]["updated_at"];
+                                            var status = result["data"]["status"];
+
+                                            if(status==0){
+                                                status = 1;
+                                            } else {
+                                                status = 0;
+                                            }
+                                            var dataString = 'id=' + id + '&name=' + name + '&email=' + email + '&provider=' + provider + '&provider_id=' + provider_id + '&avatar=' + avatar+ '&created_at=' + created_at + '&updated_at=' + updated_at + '&status=' + status;
+                                            $.ajax({
+                                                type: 'PUT',
+                                                data: dataString,
+                                                url: 'api/users/'+ i + '?' + dataString,
+                                                success: function () {
+                                                    console.log('api/users/'+ i + '?' + dataString);
+                                                }
+                                            });
+                                        },})
+                                    swal("User has been unlocked!", {
+                                        icon: "success",
+                                    });
+                                }
+                            })
+                    }
+                }
+            })
+
+
+
+
+    });})
 
 </script>
 

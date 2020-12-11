@@ -21,6 +21,7 @@ class UserRepository
         $user->provider = $request->provider;
         $user->provider_id = $request->provider_id;
         $user->email = $request->email;
+        $user->status = $request->status;
         $user->updated_at = Carbon\Carbon::now();
 
         $user->save();

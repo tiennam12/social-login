@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\LoginController;
+use App\Http\Controllers\Auth\LoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,7 +17,11 @@ use App\Http\Controllers\LoginController;
 */
 
 Route::get('/', function () {
-    return view('login');
+    if ( Auth::check() ) {
+        return redirect()->route('users');
+    } else {
+        return view('login');
+    }
 });
 Route::get('login', function () {
     return view('login');

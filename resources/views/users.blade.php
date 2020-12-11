@@ -8,12 +8,17 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
 </head>
 <body>
 <div class="container" style="max-width: 1400px;">
     <div class="text-center" style="margin: 20px 0px 20px 0px;">
         <h1 class="text-secondary">Users List</h1>
     </div>
+        <a href="/logout" data-toggle="tooltip" title="Logout">
+            <button title="Logout" style="border: none; background-color: white; color: #80bfff; cursor:pointer;" id="logout" class="fas fa-sign-out-alt fa-2x" type="button">
+            </button>
+        </a>
     <div id="table">
         @if (count($users) > 0)
             <section class="users">
@@ -24,8 +29,17 @@
         @endif
     </div>
 </div>
-<script type="text/javascript">
+</body>
+</html>
 
+<script type="text/javascript">
+    $(document).ready(function () {
+        var status = '<?php echo(Auth::user()->status);?>';
+
+        if (status == 1){
+            window.location = "/logout";
+            alert('Your account is blocked!')
+        }});
     $(function () {
         $('body').on('click', '.pagination a', function (e) {
             e.preventDefault();
@@ -45,5 +59,3 @@
         }
     });
 </script>
-</body>
-</html>

@@ -33,11 +33,20 @@
                 @endif
                     <td>{{ $user->provider_id }}</td>
                 <td>
-                    <button style="border: none; background-color: white" id="edit" class="edit" type="button" value="{{ $user->id }}">
-                        <i class="far fa-edit" style="pointer-events:none; color: #80bfff"></i>
-                    </button>
+                    @if($user->status==0)
+                        <button style="border: none; background-color: white" id="lock" class="lock_{{ $user->id }} lock" type="button" value="{{ $user->id }}">
+                            <i class="fas fa-lock-open" style="pointer-events:none; color: #80bfff"></i>
+                        </button>
+                     @else
+                        <button style="border: none; background-color: white" id="lock" class="lock_{{ $user->id }} lock" type="button" value="{{ $user->id }}">
+                            <i class="fas fa-lock" style="pointer-events:none; color: #80bfff"></i>
+                        </button>
+                    @endif
                     <button style="border: none; background-color: white" id="delete" class="delete" type="button" value="{{ $user->id }}">
                         <i class="fas fa-trash-alt" style="pointer-events:none; color: #80bfff"></i>
+                    </button>
+                    <button style="border: none; background-color: white" id="edit" class="edit" type="button" value="{{ $user->id }}">
+                        <i class="far fa-edit" style="pointer-events:none; color: #80bfff"></i>
                     </button>
                 </td>
             </tr>
@@ -51,6 +60,8 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $('.edit').click(function (e) {
+            var user1 = {!! json_encode((array)auth()->user()) !!};
+            console.log({!! json_encode((array)auth()->user()) !!});
             var i = e.target.value;
             $.ajax({
                 type: "GET",
@@ -116,6 +127,48 @@
             })
         })
     });
+
+    $(document).ready(function () {
+        $('.lock').click(function (e) {
+            var i = e.target.value;
+        $.ajax({
+            type: "GET",
+            url: 'api/users/'+i,
+            dataType: "json",
+            success: function (result) {
+                if(result["data"]["status"] == 0) {
+                    var st = '<i class="fas fa-lock" style="pointer-events:none; color: #80bfff"></i>';
+                } else {
+                    var st = '<i class="fas fa-lock-open" style="pointer-events:none; color: #80bfff"></i>';
+                }
+                $('.lock_' + i).html(st);
+                var id = result["data"]["id"];
+                var avatar = result["data"]["avatar"];
+                var name = result["data"]["name"];
+                var provider = result["data"]["provider"];
+                var email = result["data"]["email"];
+                var provider_id = result["data"]["provider_id"];
+                var created_at = result["data"]["created_at"];
+                var updated_at = result["data"]["updated_at"];
+                var status = result["data"]["status"];
+
+                if(status==0){
+                    status = 1;
+                } else {
+                    status = 0;
+                }
+                var dataString = 'id=' + id + '&name=' + name + '&email=' + email + '&provider=' + provider + '&provider_id=' + provider_id + '&avatar=' + avatar+ '&created_at=' + created_at + '&updated_at=' + updated_at + '&status=' + status;
+                $.ajax({
+                    type: 'PUT',
+                    data: dataString,
+                    url: 'api/users/'+ i + '?' + dataString,
+                    success: function () {
+                        console.log('api/users/'+ i + '?' + dataString);
+                    }
+                });
+            },})
+
+    });})
 
 </script>
 

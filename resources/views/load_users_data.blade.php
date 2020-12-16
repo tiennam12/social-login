@@ -17,9 +17,9 @@
                 <td>{{ $user->id }}</td>
                 <td width="70px">
                     @if($user->avatar)
-                        <img src="{{ $user->avatar }}" onerror="this.onerror=null; this.src='images/default.jpg'" alt="ava" width="50" height="50">
+                        <img src="{{ config('user.urlAva'). $user->avatar }}" onerror="this.onerror=null; this.src='{{ config('user.defaultAva') }}'" alt="ava" width="50" height="50">
                     @else
-                        <img src="{{ URL::asset('images/default.jpg') }}" width="50px" height="50px">
+                        <img src="{{ config('user.defaultAva') }}" width="50px" height="50px">
                     @endif
                 </td>
                 <td>{{ $user->name }}</td>
@@ -34,18 +34,18 @@
                     <td>{{ $user->provider_id }}</td>
                 <td>
                     @if($user->status==0)
-                        <button style="border: none; background-color: white; outline: none; cursor:pointer;" id="lock" class="lock_{{ $user->id }} lock" type="button" value="{{ $user->id }}">
+                        <button style="border: none; background-color: white; outline: none; cursor:pointer;" id="lock" class="lock_{{ $user->id }} lock" type="button" value="{{ $user->id }}" title="lock" data-toggle="lock">
                             <i class="fas fa-lock-open" style="pointer-events:none; color: #80bfff"></i>
                         </button>
                      @else
-                        <button style="border: none; outline: none; background-color: white; cursor:pointer;" id="lock" class="lock_{{ $user->id }} lock" type="button" value="{{ $user->id }}">
+                        <button style="border: none; outline: none; background-color: white; cursor:pointer;" id="lock" class="lock_{{ $user->id }} lock" type="button" value="{{ $user->id }}" title="unlock" data-toggle="unlock">
                             <i class="fas fa-lock" style="pointer-events:none; color: #80bfff"></i>
                         </button>
                     @endif
-                    <button style="border: none; outline: none; background-color: white; cursor:pointer;" id="delete" class="delete" type="button" value="{{ $user->id }}">
+                    <button style="border: none; outline: none; background-color: white; cursor:pointer;" id="delete" class="delete" type="button" value="{{ $user->id }}" title="delete" data-toggle="delete">
                         <i class="fas fa-trash-alt" style="pointer-events:none; color: #80bfff"></i>
                     </button>
-                    <button style="border: none; background-color: white; outline: none; cursor:pointer;" id="edit" class="edit" type="button" value="{{ $user->id }}">
+                    <button style="border: none; background-color: white; outline: none; cursor:pointer;" id="edit" class="edit" type="button" value="{{ $user->id }}" title="edit" data-toggle="edit">
                         <i class="far fa-edit" style="pointer-events:none; color: #80bfff"></i>
                     </button>
                 </td>
@@ -58,6 +58,18 @@
 {!! $users->links('pagination::bootstrap-4') !!}
 
 <script type="text/javascript">
+    $(document).ready(function(){
+        $('[data-toggle="delete"]').tooltip();
+    });
+    $(document).ready(function(){
+        $('[data-toggle="edit"]').tooltip();
+    });
+    $(document).ready(function(){
+        $('[data-toggle="lock"]').tooltip();
+    });
+    $(document).ready(function(){
+        $('[data-toggle="unlock"]').tooltip();
+    });
     $(document).ready(function () {
         $('.edit').click(function (e) {
             var i = e.target.value;
@@ -203,6 +215,11 @@
                                             }
                                             var dataString = 'id=' + id + '&name=' + name + '&email=' + email + '&provider=' + provider + '&provider_id=' + provider_id + '&avatar=' + avatar+ '&created_at=' + created_at + '&updated_at=' + updated_at + '&status=' + status;
                                             $.ajax({
+                                                type: 'GET',
+                                                data: dataString,
+                                                url: 'send-email/'+ i + '?',
+                                            });
+                                            $.ajax({
                                                 type: 'PUT',
                                                 data: dataString,
                                                 url: 'api/users/'+ i + '?' + dataString,
@@ -216,6 +233,7 @@
                                     });
                                 }
                             })
+
                     } else {
                         swal({
                             title: "Are you sure?",
@@ -254,6 +272,11 @@
                                             }
                                             var dataString = 'id=' + id + '&name=' + name + '&email=' + email + '&provider=' + provider + '&provider_id=' + provider_id + '&avatar=' + avatar+ '&created_at=' + created_at + '&updated_at=' + updated_at + '&status=' + status;
                                             $.ajax({
+                                                type: 'GET',
+                                                data: dataString,
+                                                url: 'send-email/'+ i + '?',
+                                            });
+                                            $.ajax({
                                                 type: 'PUT',
                                                 data: dataString,
                                                 url: 'api/users/'+ i + '?' + dataString,
@@ -261,12 +284,15 @@
                                                     console.log('api/users/'+ i + '?' + dataString);
                                                 }
                                             });
+
+                                            console.log(status);
                                         },})
                                     swal("User has been unlocked!", {
                                         icon: "success",
                                     });
                                 }
                             })
+
                     }
                 }
             })

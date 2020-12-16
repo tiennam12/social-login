@@ -1,6 +1,6 @@
 <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
 <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js"></script>
 <link rel="stylesheet" href="{{ secure_asset('css/app.css') }}">
 
 <div class="container">
@@ -8,13 +8,13 @@
         <h3 class="kpx_authTitle">Login or <a href="#">Sign up</a></h3>
         <div class="row kpx_row-sm-offset-3 kpx_socialButtons">
             <div class="col-xs-3 col-sm-3">
-                <a href="{{ url('/auth/redirect/facebook') }}" class="btn btn-lg btn-block kpx_btn-facebook" data-toggle="tooltip" data-placement="top" title="Facebook">
+                <a href="{{ url('/auth/redirect/facebook') }}" class="btn btn-lg btn-block kpx_btn-facebook" {{--data-toggle="tooltip"--}} data-placement="top" title="Facebook">
                     <i class="fa fa-facebook fa-2x"></i>
                     <span class="hidden-xs"></span>
                 </a>
             </div>
             <div class="col-xs-3 col-sm-3">
-                <a href="{{ route('login.provider', 'google') }}"  class="btn btn-lg btn-block kpx_btn-google-plus" data-toggle="tooltip" data-placement="top" title="Google Plus">
+                <a href="{{ route('login.provider', 'google') }}"  class="btn btn-lg btn-block kpx_btn-google-plus" {{--data-toggle="tooltip"--}}data-placement="top" title="Google Plus">
                     <i class="fa fa-google-plus fa-2x"></i>
                     <span class="hidden-xs"></span>
                 </a>
@@ -48,8 +48,3 @@
         </div>
     </div>
 </div>
-<script>
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip()
-    })
-</script>

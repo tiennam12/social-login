@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Write;
 use Carbon;
+use Illuminate\Support\Facades\Storage;
 
 use App\Models\User as User;
 
@@ -12,6 +13,8 @@ class UserRepository
 
         if($user){
             $user->delete();
+            $imageUrl = $user->avatar;
+            Storage::disk('s3')->delete($imageUrl);
         }
     }
 

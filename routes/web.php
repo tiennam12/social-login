@@ -2,8 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\EmailController;
+use App\Http\Controllers\S3ImageController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\RegisterController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,9 +37,17 @@ Route::get('/auth/redirect/{provider}', [Controller::class, 'redirect']);
 Route::get('/callback/{provider}', [Controller::class, 'callback']);
 //Route::get('home', [HomeController::class, 'index'])->name('home');
 
-Auth::routes();
+Auth::routes(['verify' => true]);
 
 //Route::get('/home', [Controller::class, 'listUser'])->name('home');
 Route::get('logout', [LoginController::class, 'logout'])->name('logout');
 
 Route::get('/users', [Controller::class, 'listUser'])->name('users');
+
+Route::get('send-email/{user}', [EmailController::class, 'sendEmail']);
+
+//Route::get('register', function () {
+//    return view('registration');
+//});
+//
+//Route::post('register', [RegisterController::class, 'store'])->name('register');

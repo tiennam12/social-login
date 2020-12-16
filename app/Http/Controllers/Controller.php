@@ -8,6 +8,8 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller as BaseController;
 use Auth;
+use Illuminate\Support\Facades\Storage;
+use mysql_xdevapi\Exception;
 use Socialite;
 use App\Models\User;
 
@@ -23,6 +25,7 @@ class Controller extends BaseController
         try {
             $getUser = Socialite::driver('google')->stateless()->user();
             $findUser = User::where('provider_id',$getUser->id)->first();
+            $ava = $this->imageUploadPost($getUser, 'google');
 
             if($findUser) {
                 Auth::login($findUser, true);
@@ -33,7 +36,7 @@ class Controller extends BaseController
                     'email' => $getUser->email,
                     'provider_id'=> $getUser->id,
                     'provider' => 'google',
-                    'avatar' => $getUser->avatar
+                    'avatar' => $ava
                 ]);
 
                 Auth::login($newUser);
@@ -60,16 +63,37 @@ class Controller extends BaseController
 
     function createUser($getUser,$provider) {
         $user = User::where('provider_id',$getUser->id)->first();
+        $ava = $this->imageUploadPost($getUser, 'facebook');
 
         if (!$user) {
             $user = User::create([
                 'name'     => $getUser->name,
                 'email'    => $getUser->email,
                 'provider' => $provider,
-                'provider_id' => $getUser->id
+                'provider_id' => $getUser->id,
+                'avatar' => $ava
             ]);
         }
+
         return $user;
+    }
+
+    public function imageUploadPost($user, $provider) {
+
+//            $this->validate($request, [
+//                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+//            ]);
+//            dd($request->image);
+        $imageName = time() . '.jpg';
+        if($provider == 'facebook') {
+            $t = Storage::disk('s3')->put($imageName, file_get_contents('https://graph.facebook.com/' . $user->id . '/picture?type=large'), 'public');
+        } else {
+            $t = Storage::disk('s3')->put($imageName, file_get_contents($user->avatar), 'public');
+        }
+        Storage::disk('s3')->url($imageName);
+
+        return $imageName;
+
     }
 
     function listUser(Request $request) {

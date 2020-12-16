@@ -8,6 +8,9 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use mysql_xdevapi\Exception;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class RegisterController extends Controller
 {
@@ -44,7 +47,7 @@ class RegisterController extends Controller
     /**
      * Get a validator for an incoming registration request.
      *
-     * @param  array  $data
+     * @param array $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
     protected function validator(array $data)
@@ -59,7 +62,7 @@ class RegisterController extends Controller
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param  array  $data
+     * @param array $data
      * @return \App\Models\User
      */
     protected function create(array $data)
@@ -69,5 +72,50 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
+    }
+
+    public function showRegistrationForm() {
+        return view('registration');
+    }
+
+    public function register(Request $request)
+    {
+        $this->validate(request(), [
+            'name' => 'required',
+            'user_name' => 'required',
+            'email' => 'required|email',
+            'password' => 'required',
+            'gender' => 'required'
+        ]);
+        $avatar = $this->storeImage($request);
+        try {
+            $user = User::create([
+                'name' => $request['name'],
+                'user_name' => $request['user_name'],
+                'email' => $request['email'],
+                'gender' => $request['gender'],
+                'password' => bcrypt($request['password']),
+                'provider_id' => time(),
+                'provider' => 'another',
+                'avatar' => $avatar
+            ]);
+
+//        auth()->login($user);
+
+            return redirect()->to('/');
+        } catch (Exception $e) {
+            return 'fail';
+        }
+    }
+
+    public function storeImage($request) {
+        if ($request->hasFile('avatar')) {
+            $filenamewithextension = $request->file('avatar')->getClientOriginalName();
+            $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
+            $filenametostore = $filename . '_' . time() . '.jpg';
+            Storage::disk('s3')->put($filenametostore, fopen($request->file('avatar'), 'r+'), 'public');
+
+            return $filenametostore;
+        }
     }
 }

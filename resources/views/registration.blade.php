@@ -14,7 +14,8 @@
         <h2>Registration Form</h2>
         <div class="form-group">
             <label for="avatar" class="col-sm-3 control-label">Choose a profile picture:</label>
-                <input type="file" id="avatar" name="avatar">
+                <input type="file" id="avatar" name="avatar" style="padding: 20px" onchange="previewFile1(this);">
+                <div id="preview"></div>
         </div>
         <div class="form-group">
             <label for="fullName" class="col-sm-3 control-label">Full Name</label>
@@ -45,7 +46,6 @@
             <label for="password" class="col-sm-3 control-label">Confirm Password</label>
             <div class="col-sm-9">
                 <input type="password" id="confirm_password" placeholder="Confirm Password" class="form-control">
-                <span id='message'></span>
             </div>
         </div>
         {{--        <div class="form-group">--}}

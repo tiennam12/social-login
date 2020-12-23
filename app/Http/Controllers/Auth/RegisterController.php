@@ -5,12 +5,12 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use App\Models\User;
+use GuzzleHttp\Psr7\Request;
+use http\Message;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use mysql_xdevapi\Exception;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
 {
@@ -32,7 +32,7 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    protected $redirectTo = '/users';
 
     /**
      * Create a new controller instance.
@@ -50,12 +50,13 @@ class RegisterController extends Controller
      * @param array $data
      * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validator(array $data)
-    {
+    protected function validator(array $data) {
         return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'name' => ['required'],
+            'gender' => ['required'],
+            'user_name' => ['required', 'unique:users,user_name,NULL,id,deleted_at,NULL'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,NULL,id,deleted_at,NULL'],
+            'password' => ['required', 'string', 'min:8', 'confirmed']
         ]);
     }
 
@@ -65,57 +66,27 @@ class RegisterController extends Controller
      * @param array $data
      * @return \App\Models\User
      */
-    protected function create(array $data)
+    public function create(array $request)
     {
+        $avatar = $this->storeAvatar($request);
+
         return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+            'name' => $request['name'],
+            'email' => $request['email'],
+            'password' => Hash::make($request['password']),
+            'user_name' => $request['user_name'],
+            'gender' => $request['gender'],
+            'provider_id' => time(),
+            'provider' => 'another',
+            'avatar' => $avatar
         ]);
     }
 
-    public function showRegistrationForm() {
-        return view('registration');
-    }
+    public function storeAvatar($data) {
+        $imageName = time() . '.jpg';
+        $t = Storage::disk('s3')->put($imageName, file_get_contents($data['avatar']), 'public');
+        Storage::disk('s3')->url($imageName);
 
-    public function register(Request $request)
-    {
-        $this->validate(request(), [
-            'name' => 'required',
-            'user_name' => 'required',
-            'email' => 'required|email',
-            'password' => 'required',
-            'gender' => 'required'
-        ]);
-        $avatar = $this->storeImage($request);
-        try {
-            $user = User::create([
-                'name' => $request['name'],
-                'user_name' => $request['user_name'],
-                'email' => $request['email'],
-                'gender' => $request['gender'],
-                'password' => bcrypt($request['password']),
-                'provider_id' => time(),
-                'provider' => 'another',
-                'avatar' => $avatar
-            ]);
-
-//        auth()->login($user);
-
-            return redirect()->to('/');
-        } catch (Exception $e) {
-            return 'fail';
-        }
-    }
-
-    public function storeImage($request) {
-        if ($request->hasFile('avatar')) {
-            $filenamewithextension = $request->file('avatar')->getClientOriginalName();
-            $filename = pathinfo($filenamewithextension, PATHINFO_FILENAME);
-            $filenametostore = $filename . '_' . time() . '.jpg';
-            Storage::disk('s3')->put($filenametostore, fopen($request->file('avatar'), 'r+'), 'public');
-
-            return $filenametostore;
-        }
+        return $imageName;
     }
 }

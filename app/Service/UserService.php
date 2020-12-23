@@ -26,6 +26,15 @@ class UserService
         return response()->json($this->_response, 200);
     }
 
+    public function createUser($request)
+    {
+        $this->_response->data = $this->_writeUser::insertUser($request);
+        $this->_response->success = true;
+        $this->_response->message = __('update user success');
+
+        return response()->json($this->_response, 201);
+    }
+
     public function updateUser($request,$id) {
         $this->_response->data = $this->_writeUser::updateUser($request,$id);
         $this->_response->success = true;

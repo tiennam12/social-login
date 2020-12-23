@@ -7,6 +7,7 @@ use App\Http\Controllers\S3ImageController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Api\UserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,7 +21,7 @@ use App\Http\Controllers\Auth\RegisterController;
 */
 
 Route::get('/', function () {
-    if ( Auth::check() ) {
+    if ( isset($_COOKIE["jwt_token"]) ) {
         return redirect()->route('users');
     } else {
         return view('login');
@@ -35,19 +36,20 @@ Route::get('redirect/{driver}', [Controller::class, 'redirectToProvider'])
 Route::get('google/callback', [Controller::class, 'handleGoogleCallback']);
 Route::get('/auth/redirect/{provider}', [Controller::class, 'redirect']);
 Route::get('/callback/{provider}', [Controller::class, 'callback']);
-//Route::get('home', [HomeController::class, 'index'])->name('home');
+//Route::get('home', [HomeController::class, 'index'])->name('home')->middleware('auth.jwt');
 
 Auth::routes(['verify' => true]);
 
 //Route::get('/home', [Controller::class, 'listUser'])->name('home');
-Route::get('logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('logout', [LoginController::class, 'logout1'])->name('logout');
 
-Route::get('/users', [Controller::class, 'listUser'])->name('users');
+Route::get('/users', [Controller::class, 'listUser'])->middleware('add')->name('users')->middleware('auth.jwt');
 
 Route::get('send-email/{user}', [EmailController::class, 'sendEmail']);
+Route::get('verify', function() { return view('auth.verify');});
 
-//Route::get('register', function () {
-//    return view('registration');
-//});
-//
-//Route::post('register', [RegisterController::class, 'store'])->name('register');
+
+Route::get('test', [UserController::class, 'getUserInfo']);
+Route::get('email/verify/{id}', 'Controller@verify')->name('verification.verify');
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->middleware('auth.jwt')->name('home');

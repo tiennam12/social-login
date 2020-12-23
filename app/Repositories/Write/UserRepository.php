@@ -2,7 +2,10 @@
 
 namespace App\Repositories\Write;
 use Carbon;
+use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Auth;
 
 use App\Models\User as User;
 
@@ -28,5 +31,35 @@ class UserRepository
         $user->updated_at = Carbon\Carbon::now();
 
         $user->save();
+    }
+
+    public static function insertUser($request) {
+        $avatar = self::storeAva($request);
+        $user = User::create([
+            'name' => $request['name'],
+            'email' => $request['email'],
+            'password' => Hash::make($request['password']),
+            'user_name' => $request['user_name'],
+            'gender' => $request['gender'],
+            'provider_id' => time(),
+            'provider' => 'another',
+            'avatar' => $avatar
+        ]);
+        Auth::login($user,true);
+        $user->sendEmailVerificationNotification();
+        $user->save();
+    }
+
+    public static function storeAva($data) {
+        if ($data['avatar'] == 'undefined'){
+            $imageName = 'https://mybuckettiennam12.s3-ap-southeast-1.amazonaws.com/765-default-avatar.jpeg';
+        } else {
+            $imageName = time() . '.jpg';
+            $t = Storage::disk('s3')->put($imageName, file_get_contents($data['avatar']), 'public');
+            Storage::disk('s3')->url($imageName);
+        }
+
+            return $imageName;
+
     }
 }

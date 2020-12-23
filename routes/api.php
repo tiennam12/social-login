@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Auth\LoginController;
 
 /*
 |--------------------------------------------------------------------------
@@ -23,3 +24,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::put('/users/{user}',[UserController::class, 'update']);
 Route::delete('/users/{user}',[UserController::class, 'deleteUser']);
 Route::get('/users/{user}',[UserController::class, 'show']);
+Route::post('/users', [UserController::class, 'store']);
+Route::post('/login', [LoginController::class, 'login1']);

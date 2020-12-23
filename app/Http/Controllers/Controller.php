@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 use mysql_xdevapi\Exception;
 use Socialite;
 use App\Models\User;
+Use \Carbon\Carbon;
+use Illuminate\Support\Facades\Validator;
 
 class Controller extends BaseController
 {
@@ -24,25 +26,31 @@ class Controller extends BaseController
     public function handleGoogleCallback() {
         try {
             $getUser = Socialite::driver('google')->stateless()->user();
-            $findUser = User::where('provider_id',$getUser->id)->first();
-            $ava = $this->imageUploadPost($getUser, 'google');
+            $findUser = User::where('provider_id',$getUser->id)->orWhere('email', $getUser->email)->first();
 
             if($findUser) {
                 Auth::login($findUser, true);
 
             }else{
+//                $getUser->validate([
+//                    'email' => ['required', 'unique:users,user_name,NULL,id,deleted_at,NULL'],
+//                ]);
+                $ava = $this->imageUploadPost($getUser, 'google');
                 $newUser = User::create([
                     'name' => $getUser->name,
+                    'user_name' => $getUser->name,
                     'email' => $getUser->email,
                     'provider_id'=> $getUser->id,
                     'provider' => 'google',
-                    'avatar' => $ava
+                    'avatar' => $ava,
+                    'email_verified_at' => Carbon::now()
                 ]);
-
+                $pro1 = 'social';
                 Auth::login($newUser);
+                setcookie("social",$pro1);
 
             }
-            return redirect()->route('users');
+            return redirect()->route('users')->cookie("social","social");
 
         } catch (Exception $e) {
             return redirect('auth/google');
@@ -57,21 +65,32 @@ class Controller extends BaseController
         $getUser = Socialite::driver($provider)->stateless()->user();
         $user = $this->createUser($getUser,$provider);
         auth()->login($user);
+        $pro = 'social';
+        setcookie("social",$pro);
 
-        return redirect()->route('users');
+        return redirect()->route('users',[$pro])->cookie("social",$pro);
     }
 
     function createUser($getUser,$provider) {
-        $user = User::where('provider_id',$getUser->id)->first();
-        $ava = $this->imageUploadPost($getUser, 'facebook');
+        $user = User::where('provider_id',$getUser->id)->orWhere('email', $getUser->email)->first();
+//        $validate = Validator::make(
+//            $getUser->all(),
+//            [
+//                'email' => ['required', 'unique:users,user_name,NULL,id,deleted_at,NULL'],
+//            ]);
+//        if ($validate->fails()) {
+//            return back()->withErrors($validate);
+//        }
 
         if (!$user) {
+            $ava = $this->imageUploadPost($getUser, 'facebook');
             $user = User::create([
                 'name'     => $getUser->name,
                 'email'    => $getUser->email,
                 'provider' => $provider,
                 'provider_id' => $getUser->id,
-                'avatar' => $ava
+                'avatar' => $ava,
+                'email_verified_at' => Carbon::now()
             ]);
         }
 
@@ -104,5 +123,12 @@ class Controller extends BaseController
             return view('load_users_data', compact('users'));
         }
         return view('users', compact('users', 'perPage'));
+    }
+
+    function verify($id) {
+        $user = User::whereId($id)->first();
+        $user->email_verified_at = Carbon::now();
+        $user->save();
+        return view('login');
     }
 }

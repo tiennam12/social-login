@@ -20,10 +20,14 @@ class UserService
 
     public function showUser($id) {
         $this->_response->data = $this->_readUser::showUser($id);
-        $this->_response->success = true;
-        $this->_response->message = __('success');
+        if(isset($this->_response->data->id)) {
+            $this->_response->success = true;
+            $this->_response->message = __('success');
 
-        return response()->json($this->_response, 200);
+            return response()->json($this->_response, 200);
+        } else {
+            return response()->json('not found',404);
+        }
     }
 
     public function createUser($request)

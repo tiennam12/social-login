@@ -6,7 +6,7 @@ use App\Models\User as  User;
 
 class UserRepository {
     public static function showUser($id) {
-        $user = User::findOrFail($id);
+        $user = User::find($id);
 
         return $user;
     }
